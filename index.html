@@ -43,10 +43,12 @@ html,body{margin:0;height:100%;overflow:hidden;background:#000}
 </head>
 
 <body>
-  <audio id="bgMusic" loop preload="auto">
+
+<audio id="bgMusic" loop preload="auto">
   <source src="musica.mp3" type="audio/mpeg">
   <source src="musica.ogg" type="audio/ogg">
 </audio>
+
 <canvas id="c"></canvas>
 
 <div id="msg1" class="msg">Sonríe… tus ojos merecen brillar ✨</div>
@@ -55,36 +57,41 @@ html,body{margin:0;height:100%;overflow:hidden;background:#000}
 <div id="meteorMsg" class="msg">Todo estará bien 💛</div>
 
 <script>
-  // 🎵 MÚSICA UNIVERSAL AL PRIMERA INTERACCIÓN
+
+// 🎵 MÚSICA UNIVERSAL AL PRIMERA INTERACCIÓN (FIX MÓVIL)
 
 const music = document.getElementById("bgMusic");
 
 function startMusic() {
 
-  // Evita múltiples ejecuciones
   if (!music.paused) return;
 
-  music.volume = 0;
-  music.play().catch(()=>{}); // evita errores en algunos navegadores
+  const p = music.play();
 
-  // 🌫️ Fade-in suave
-  let v = 0;
-  const fade = setInterval(() => {
-    v += 0.01;
-    music.volume = Math.min(v, 0.4);
-    if (v >= 0.4) clearInterval(fade);
-  }, 100);
+  if (p !== undefined) {
+    p.then(() => {
 
-  // 🔒 Quitar listeners (solo una vez)
+      music.volume = 0;
+
+      let v = 0;
+      const fade = setInterval(() => {
+        v += 0.01;
+        music.volume = Math.min(v, 0.4);
+        if (v >= 0.4) clearInterval(fade);
+      }, 100);
+
+    }).catch(()=>{});
+  }
+
   window.removeEventListener("click", startMusic);
   window.removeEventListener("touchstart", startMusic);
   window.removeEventListener("keydown", startMusic);
 }
 
-// 👇 Escucha TODAS las interacciones principales
+window.addEventListener("touchstart", startMusic, { passive: true });
 window.addEventListener("click", startMusic);
-window.addEventListener("touchstart", startMusic);
 window.addEventListener("keydown", startMusic);
+
 // ===== RENDER =====
 const renderer=new THREE.WebGLRenderer({canvas:c,antialias:true});
 renderer.setSize(innerWidth,innerHeight);
@@ -391,7 +398,6 @@ function animate(){
   words.rotation.y+=0.0003;
   sky.rotation.y+=0.00005;
 
-  // meteoros
   for(let i=meteors.length-1;i>=0;i--){
     const m=meteors[i];
     m.position.x+=m.userData.vx;
@@ -408,7 +414,6 @@ function animate(){
     }
   }
 
-  // partículas
   for(let i=particles.length-1;i>=0;i--){
     const p=particles[i];
 
@@ -426,7 +431,6 @@ function animate(){
     }
   }
 
-  // constelaciones
   for(let i=constellations.length-1;i>=0;i--){
     const c=constellations[i];
     c.userData.life++;
@@ -451,5 +455,6 @@ window.addEventListener("resize",()=>{
   renderer.setSize(innerWidth,innerHeight);
 });
 </script>
+
 </body>
 </html>

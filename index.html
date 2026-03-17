@@ -43,14 +43,48 @@ html,body{margin:0;height:100%;overflow:hidden;background:#000}
 </head>
 
 <body>
+  <audio id="bgMusic" loop preload="auto">
+  <source src="musica.mp3" type="audio/mpeg">
+  <source src="musica.ogg" type="audio/ogg">
+</audio>
 <canvas id="c"></canvas>
 
-<div id="msg1" class="msg">No tienes que luchar ahora 💛</div>
-<div id="msg2" class="msg">Puedes descansar un momento</div>
+<div id="msg1" class="msg">Sonríe… tus ojos merecen brillar ✨</div>
+<div id="msg2" class="msg">¿Si sonreiste?</div>
 <div id="msg3" class="msg">Tu vida importa ❤️</div>
 <div id="meteorMsg" class="msg">Todo estará bien 💛</div>
 
 <script>
+  // 🎵 MÚSICA UNIVERSAL AL PRIMERA INTERACCIÓN
+
+const music = document.getElementById("bgMusic");
+
+function startMusic() {
+
+  // Evita múltiples ejecuciones
+  if (!music.paused) return;
+
+  music.volume = 0;
+  music.play().catch(()=>{}); // evita errores en algunos navegadores
+
+  // 🌫️ Fade-in suave
+  let v = 0;
+  const fade = setInterval(() => {
+    v += 0.01;
+    music.volume = Math.min(v, 0.4);
+    if (v >= 0.4) clearInterval(fade);
+  }, 100);
+
+  // 🔒 Quitar listeners (solo una vez)
+  window.removeEventListener("click", startMusic);
+  window.removeEventListener("touchstart", startMusic);
+  window.removeEventListener("keydown", startMusic);
+}
+
+// 👇 Escucha TODAS las interacciones principales
+window.addEventListener("click", startMusic);
+window.addEventListener("touchstart", startMusic);
+window.addEventListener("keydown", startMusic);
 // ===== RENDER =====
 const renderer=new THREE.WebGLRenderer({canvas:c,antialias:true});
 renderer.setSize(innerWidth,innerHeight);
